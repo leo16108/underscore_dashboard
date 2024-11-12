@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Betting Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase and Chart.js Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>Track My Bets</h1>
+    </header>
+
+    <!-- Date Range and Bulk Actions -->
+    <section id="date-range">
+        <label for="from">From:</label>
+        <input type="date" id="from">
+        <label for="until">Until:</label>
+        <input type="date" id="until">
+        <button onclick="applyDates()">Apply Dates</button>
+        
+        <select id="bulk-action">
+            <option value="">Bulk Action</option>
+            <option value="delete">Delete Bets</option>
+        </select>
+    </section>
+
+    <!-- Bet Tracker Form -->
+    <section id="bet-tracker">
+        <div id="bets-list">
+            <!-- Bet Entries will be dynamically added here -->
+        </div>
+        <button onclick="addBet()">Add Bet</button>
+        <button onclick="saveChanges()">Save Changes</button>
+    </section>
+
+    <!-- Profit Overview -->
+    <section id="profit-overview">
+        <h2>Profits</h2>
+        <p>Today: $<span id="today-profit">0.00</span></p>
+        <p>This Month: $<span id="this-month-profit">0.00</span></p>
+        <p>Last Month: $<span id="last-month-profit">0.00</span></p>
+        <p>Total Profit Made: $<span id="total-profit">0.00</span></p>
+    </section>
+
+    <!-- Cumulative Profit Chart -->
+    <section id="cumulative-profit">
+        <h2>Your Personal Cumulative Profit Chart</h2>
+        <canvas id="cumulativeChart" width="400" height="200"></canvas>
+    </section>
+
+    <!-- Firebase and JavaScript Files -->
+    <script src="scripts.js"></script>
+
+</body>
+</html>
