@@ -1,33 +1,88 @@
+/* General Styling */
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
-}
-
-header {
-    text-align: center;
-    margin-top: 20px;
-}
-
-section {
-    margin: 20px;
-}
-
-#date-range, #profit-overview, #cumulative-profit {
-    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 20px;
-    border-radius: 8px;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+/* Summary Cards */
+.summary {
+    display: flex;
+    gap: 10px;
     margin-bottom: 20px;
 }
 
-button {
-    margin: 5px;
-    padding: 10px 15px;
-    border: none;
-    background-color: #007BFF;
-    color: white;
+.card {
+    background-color: #fff;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    cursor: pointer;
+    padding: 10px 20px;
+    width: 150px;
+    text-align: center;
 }
 
-button:hover {
-    background-color: #0056b3;
+.card h3 {
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.card p {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #28a745;
+}
+
+/* Main Content Area */
+.main-content {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    gap: 20px;
+}
+
+/* Sidebar Sections */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 25%;
+}
+
+.section {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+.section h4 {
+    margin-bottom: 10px;
+}
+
+.upcoming-bets ul,
+.chats ul {
+    list-style: none;
+    padding: 0;
+}
+
+.upcoming-bets ul li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Chart Section */
+.chart-section {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    flex: 1;
 }

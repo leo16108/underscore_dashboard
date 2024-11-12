@@ -12,50 +12,53 @@
 </head>
 <body>
 
-    <header>
-        <h1>Track My Bets</h1>
-    </header>
-
-    <!-- Date Range and Bulk Actions -->
-    <section id="date-range">
-        <label for="from">From:</label>
-        <input type="date" id="from">
-        <label for="until">Until:</label>
-        <input type="date" id="until">
-        <button onclick="applyDates()">Apply Dates</button>
-        
-        <select id="bulk-action">
-            <option value="">Bulk Action</option>
-            <option value="delete">Delete Bets</option>
-        </select>
-    </section>
-
-    <!-- Bet Tracker Form -->
-    <section id="bet-tracker">
-        <div id="bets-list">
-            <!-- Bet Entries will be dynamically added here -->
+    <!-- Top Summary Section -->
+    <div class="summary">
+        <div class="card">
+            <h3>Today</h3>
+            <p id="today-profit">EUR 0</p>
         </div>
-        <button onclick="addBet()">Add Bet</button>
-        <button onclick="saveChanges()">Save Changes</button>
-    </section>
+        <div class="card">
+            <h3>Yesterday</h3>
+            <p id="yesterday-profit">EUR 0</p>
+        </div>
+        <div class="card">
+            <h3>This Month</h3>
+            <p id="monthly-profit">EUR 0</p>
+        </div>
+        <div class="card">
+            <h3>All Time</h3>
+            <p id="all-time-profit">EUR 0</p>
+        </div>
+    </div>
 
-    <!-- Profit Overview -->
-    <section id="profit-overview">
-        <h2>Profits</h2>
-        <p>Today: $<span id="today-profit">0.00</span></p>
-        <p>This Month: $<span id="this-month-profit">0.00</span></p>
-        <p>Last Month: $<span id="last-month-profit">0.00</span></p>
-        <p>Total Profit Made: $<span id="total-profit">0.00</span></p>
-    </section>
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Upcoming Bets and Chat -->
+        <div class="sidebar">
+            <div class="section upcoming-bets">
+                <h4>Upcoming Bets</h4>
+                <ul id="upcoming-bets-list">
+                    <!-- Upcoming bets go here -->
+                </ul>
+            </div>
+            <div class="section chats">
+                <h4>Announcements</h4>
+                <ul>
+                    <li># general</li>
+                    <li># help</li>
+                    <li># public-bets</li>
+                </ul>
+            </div>
+        </div>
 
-    <!-- Cumulative Profit Chart -->
-    <section id="cumulative-profit">
-        <h2>Your Personal Cumulative Profit Chart</h2>
-        <canvas id="cumulativeChart" width="400" height="200"></canvas>
-    </section>
+        <!-- Graph Section -->
+        <div class="chart-section">
+            <h3>Monthly Profit Trend</h3>
+            <canvas id="profit-chart"></canvas>
+        </div>
+    </div>
 
-    <!-- Firebase and JavaScript Files -->
     <script src="scripts.js"></script>
-
 </body>
 </html>

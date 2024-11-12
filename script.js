@@ -1,22 +1,23 @@
-// Import the functions from the Firebase SDK
+// Import Firebase functions from the SDK
 import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database"; // Import the database module 
+import { getDatabase, ref, onValue, set } from "firebase/database"; // Import necessary database functions
+import { Chart } from "chart.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyB9HNUVqKfU5A8Iuias2vyVEbOdxO_byB8",
-    authDomain: "underscore-tracker.firebaseapp.com",
-    databaseURL: "https://underscore-tracker-default-rtdb.firebaseio.com",
-    projectId: "underscore-tracker",
-    storageBucket: "underscore-tracker.firebasestorage.app",
-    messagingSenderId: "846352298994",
-    appId: "1:846352298994:web:eca11254b2d1edc340b16b",
-    measurementId: "G-65F9KHVGEN"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    databaseURL: "YOUR_DATABASE_URL",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID",
+    measurementId: "YOUR_MEASUREMENT_ID"
 };
 
-// Initialize Firebase
+// Initialize Firebase and Database
 const app = initializeApp(firebaseConfig);
-const database = getDatabase(app); // Initialize the Realtime Database 
+const database = getDatabase(app);
 
 // Variables to store data
 let bets = [];
@@ -24,8 +25,9 @@ let totalProfit = 0;
 
 // Load bets from Firebase
 const loadBets = () => {
-    database.ref("bets").on("value", (snapshot) => {
-        bets = snapshot.val() || [];
+    const betsRef = ref(database, "bets");
+    onValue(betsRef, (snapshot) => {
+        bets = snapshot.val() ? Object.values(snapshot.val()) : [];
         renderBets();
         calculateProfits();
         renderCumulativeChart();
@@ -41,13 +43,13 @@ const renderBets = () => {
         const betElement = document.createElement("div");
         betElement.classList.add("bet-entry");
         betElement.innerHTML = `
-            <input type="date" value="${bet.date}">
-            <input type="text" value="${bet.type}" placeholder="Bet Type">
-            <input type="text" value="${bet.bookmaker}" placeholder="Bookmaker">
-            <input type="text" value="${bet.runner}" placeholder="Runner/Player">
-            <input type="number" value="${bet.odds}" placeholder="Odds">
-            <input type="number" value="${bet.stake}" placeholder="Stake">
-            <select>
+            <input type="date" value="${bet.date}" onchange="updateBet(${index}, 'date', this.value)">
+            <input type="text" value="${bet.type}" placeholder="Bet Type" onchange="updateBet(${index}, 'type', this.value)">
+            <input type="text" value="${bet.bookmaker}" placeholder="Bookmaker" onchange="updateBet(${index}, 'bookmaker', this.value)">
+            <input type="text" value="${bet.runner}" placeholder="Runner/Player" onchange="updateBet(${index}, 'runner', this.value)">
+            <input type="number" value="${bet.odds}" placeholder="Odds" onchange="updateBet(${index}, 'odds', parseFloat(this.value))">
+            <input type="number" value="${bet.stake}" placeholder="Stake" onchange="updateBet(${index}, 'stake', parseFloat(this.value))">
+            <select onchange="updateBet(${index}, 'result', this.value)">
                 <option value="Win" ${bet.result === "Win" ? "selected" : ""}>Win</option>
                 <option value="Loss" ${bet.result === "Loss" ? "selected" : ""}>Loss</option>
             </select>
@@ -61,30 +63,47 @@ const renderBets = () => {
 // Add a new bet entry
 const addBet = () => {
     bets.push({
-        date: "",
+        date: new Date().toISOString().split("T")[0], // Default to today's date
         type: "",
         bookmaker: "",
         runner: "",
-        odds: "",
-        stake: "",
+        odds: 0,
+        stake: 0,
         result: "Win",
         profit: 0
     });
     renderBets();
 };
 
-// Save changes to Firebase
-const saveChanges = () => {
-    database.ref("bets").set(bets);
-    alert("Changes saved!");
+// Update a specific bet's property
+window.updateBet = (index, property, value) => {
+    bets[index][property] = value;
+    if (property === 'odds' || property === 'stake' || property === 'result') {
+        bets[index].profit = calculateProfit(bets[index].odds, bets[index].stake, bets[index].result);
+    }
+    saveChanges();
+    calculateProfits();
+    renderCumulativeChart();
 };
 
-// Calculate profits
+// Save changes to Firebase
+const saveChanges = () => {
+    set(ref(database, "bets"), bets);
+};
+
+// Calculate profit based on bet result
+const calculateProfit = (odds, stake, result) => {
+    if (result === "Win") {
+        return (odds - 1) * stake;
+    }
+    return -stake; // Loss equals negative stake
+};
+
+// Calculate profits for different periods
 const calculateProfits = () => {
     let todayProfit = 0;
     let thisMonthProfit = 0;
-    let lastMonthProfit = 0;
-    totalProfit = 0;
+    let totalProfit = 0;
 
     const today = new Date();
     const thisMonth = today.getMonth();
@@ -95,12 +114,10 @@ const calculateProfits = () => {
         const profit = parseFloat(bet.profit) || 0;
         totalProfit += profit;
 
-        // Calculate today’s profit
         if (betDate.toDateString() === today.toDateString()) {
             todayProfit += profit;
         }
 
-        // Calculate this month’s profit
         if (betDate.getMonth() === thisMonth && betDate.getFullYear() === thisYear) {
             thisMonthProfit += profit;
         }
@@ -114,6 +131,7 @@ const calculateProfits = () => {
 // Render cumulative profit chart
 const renderCumulativeChart = () => {
     const ctx = document.getElementById("cumulativeChart").getContext("2d");
+
     const dates = bets.map(bet => bet.date);
     const cumulativeProfits = bets.reduce((acc, bet) => {
         const lastProfit = acc.length ? acc[acc.length - 1] : 0;
@@ -121,7 +139,11 @@ const renderCumulativeChart = () => {
         return acc;
     }, []);
 
-    new Chart(ctx, {
+    if (window.cumulativeChart) {
+        window.cumulativeChart.destroy(); // Destroy previous chart instance if it exists
+    }
+
+    window.cumulativeChart = new Chart(ctx, {
         type: "line",
         data: {
             labels: dates,
